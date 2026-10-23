@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101f30">
+  <meta name="description" content="Weekly and all-time UNO scoreboard for the office. Log matches, crown champions, settle rivalries.">
+  <title>UNO Club — The Office Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="topbar container">
+      <a class="brand" href="./" aria-label="UNO Club home">
+        <span class="brand-mark" aria-hidden="true"><span>U</span></span>
+        <span class="brand-type">UNO<span>CLUB</span><small>THE OFFICE EDITION</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="status-pill" id="connection-status"><span class="status-dot"></span><span id="connection-label">Connecting</span></span>
+        <button type="button" class="button button-quiet button-small" id="refresh-button" title="Refresh scores" aria-label="Refresh scores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 11a8 8 0 0 0-14.8-4M4 4v4h4M4 13a8 8 0 0 0 14.8 4M20 20v-4h-4"/></svg><span>Refresh</span></button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-content">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> THE OFFICIAL, VERY SERIOUS UNO RANKINGS</div>
+          <h1 id="hero-title">Friendships fade.<br><em>Scores don't.</em></h1>
+          <p>Every win counts. Every card hurts. See who rules the table and who is collecting all the wrong cards.</p>
+          <div class="rule-chips" aria-label="Scoring rules"><span><i class="rules-icon rules-red">1</i> +3 pts</span><span><i class="rules-icon rules-blue">2</i> +2 pts</span><span><i class="rules-icon rules-yellow">3</i> +1 pt</span><span><i class="rules-icon rules-black">−</i> −1 split on ties</span></div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-halo"></div>
+          <div class="game-card card-blue"><div class="corner-label">+2</div><span class="card-center">2</span><div class="corner-label bottom-label">+2</div></div>
+          <div class="game-card card-yellow"><div class="corner-label">+1</div><span class="card-center">3</span><div class="corner-label bottom-label">+1</div></div>
+          <div class="game-card card-red"><div class="corner-label">+3</div><span class="card-center">1</span><div class="corner-label bottom-label">+3</div></div>
+          <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✧</span>
+        </div>
+      </section>
+
+      <div id="preview-notice" class="info-notice hidden" role="status"><strong>Excel preview mode.</strong> You're viewing imported Week 42–43 scores. Connect Supabase using <code>config.js</code> to enable live scores and submissions.</div>
+      <div id="error-notice" class="error-notice hidden" role="alert"></div>
+
+      <section class="summary-grid" aria-label="Scoreboard highlights">
+        <div class="stat-box"><div class="stat-icon stat-gold">★</div><div><p>ALL-TIME LEADER</p><strong id="overall-leader">—</strong><small id="overall-leader-points">— points</small></div></div>
+        <div class="stat-box"><div class="stat-icon stat-red">↗</div><div><p>THIS WEEK'S LEADER</p><strong id="weekly-leader">—</strong><small id="weekly-leader-points">— points</small></div></div>
+        <div class="stat-box"><div class="stat-icon stat-blue">♟</div><div><p>PLAYERS IN THE CLUB</p><strong id="stat-players">—</strong><small>and counting</small></div></div>
+        <div class="stat-box"><div class="stat-icon stat-green">✓</div><div><p>NEW MATCHES LOGGED</p><strong id="stat-matches">—</strong><small>since moving online</small></div></div>
+      </section>
+
+      <div class="content-grid">
+        <section class="leaderboard-panel panel" aria-labelledby="leaderboard-heading">
+          <div class="panel-header board-header">
+            <div>
+              <span class="section-kicker">THE STANDINGS</span>
+              <h2 id="leaderboard-heading">Leaderboard <span class="red-asterisk">✳</span></h2>
+              <p>Bragging rights, backed by data.</p>
+            </div>
+            <div class="segmented" role="group" aria-label="Leaderboard period"><button class="selected" type="button" id="weekly-tab" aria-pressed="true">Weekly</button><button type="button" id="alltime-tab" aria-pressed="false">All time</button></div>
+          </div>
+
+          <div class="week-controls" id="week-controls">
+            <div class="week-label-group"><span class="calendar-icon" aria-hidden="true">▦</span><div><strong id="week-label">Week 43, 2026</strong><small id="week-range">19–25 October</small></div></div>
+            <div class="week-actions"><button class="mini-arrow" type="button" id="previous-week" aria-label="Previous week">←</button><button class="button button-today" type="button" id="today-week">This week</button><button class="mini-arrow" type="button" id="next-week" aria-label="Next week">→</button></div>
+          </div>
+
+          <div class="podium" id="podium" aria-label="Top three players"></div>
+          <div class="table-wrap">
+            <table class="leaderboard-table">
+              <thead><tr><th scope="col">RANK</th><th scope="col">PLAYER</th><th scope="col" class="numeric-col" title="First-place finishes">1ST</th><th scope="col" class="numeric-col" title="Second-place finishes">2ND</th><th scope="col" class="numeric-col" title="Third-place finishes">3RD</th><th scope="col" class="numeric-col" title="Total split most-card penalties">PENALTIES</th><th scope="col" class="numeric-col points-heading">POINTS ↓</th></tr></thead>
+              <tbody id="leaderboard-body"><tr><td colspan="7" class="table-empty">Loading the rankings…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="panel-footer"><span><span class="footer-dot"></span><span id="row-count">—</span> players on the board</span><span>−1 is split evenly for tied most-card players</span></div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel entry-panel" aria-labelledby="entry-heading">
+            <div class="entry-heading"><div class="section-kicker">YOUR TURN</div><h2 id="entry-heading">Record a match <span class="scribble">↗</span></h2><p>Three podium spots. One unfortunate card collector (or more).</p></div>
+            <div id="auth-locked" class="auth-area">
+              <div class="lock-stamp">✦</div>
+              <strong>Scorekeepers only</strong>
+              <p>Anyone can check the standings. Authorized teammates can submit matches with a one-click email login.</p>
+              <form id="login-form" class="auth-form"><label for="login-email">WORK EMAIL</label><input id="login-email" type="email" autocomplete="email" placeholder="you@work.com" required><button class="button button-dark full-width" type="submit" id="login-button">Email me a sign-in link <span>→</span></button></form>
+              <div class="inline-message" id="auth-message" role="status"></div>
+            </div>
+            <div id="auth-no-permission" class="auth-area hidden"><div class="lock-stamp">!</div><strong>Viewing access only</strong><p>This email is signed in but hasn't been approved to record scores. Ask the organizer to add it to the Supabase editors list.</p><button class="text-button" type="button" id="sign-out-no-permission">Sign out</button></div>
+            <div id="match-entry" class="hidden">
+              <div class="signed-in-bar"><span><span class="signed-dot"></span><span id="user-email"></span></span><button type="button" id="sign-out" class="text-button">Sign out</button></div>
+              <form id="match-form">
+                <label class="field-label" for="match-date">DATE PLAYED</label><input type="date" id="match-date" name="match-date" required>
+                <div class="form-rule"></div>
+                <span class="field-label">PODIUM FINISHERS</span>
+                <div class="place-field"><div class="place-number first">1</div><label for="first-place">1st place <small>+3 points</small></label><select id="first-place" required><option value="">Select player</option></select></div>
+                <div class="place-field"><div class="place-number second">2</div><label for="second-place">2nd place <small>+2 points</small></label><select id="second-place" required><option value="">Select player</option></select></div>
+                <div class="place-field"><div class="place-number third">3</div><label for="third-place">3rd place <small>+1 point</small></label><select id="third-place" required><option value="">Select player</option></select></div>
+                <div class="form-rule"></div>
+                <div class="loser-heading"><span class="field-label">MOST CARDS <span class="required">*</span></span><span class="field-hint">Select everyone tied</span></div>
+                <div class="losers-grid" id="losers-grid" aria-label="Select players with the most cards"></div>
+                <div class="penalty-preview" id="penalty-preview">Pick at least one player who had the most cards.</div>
+                <label class="field-label notes-label" for="match-notes">MATCH NOTE <span class="optional">OPTIONAL</span></label><input id="match-notes" maxlength="300" placeholder="An unforgettable comeback…" autocomplete="off">
+                <button type="submit" class="button button-submit full-width" id="submit-match">Save this match <span>↗</span></button>
+                <div class="inline-message" id="match-message" role="status"></div>
+              </form>
+              <button class="add-player-button" type="button" id="add-player-open">＋ Add a new player to the club</button>
+            </div>
+          </section>
+
+          <section class="panel recent-panel" aria-labelledby="recent-heading"><div class="recent-header"><div><span class="section-kicker">THE PAPER TRAIL</span><h3 id="recent-heading">Recent matches</h3></div><span class="history-count" id="history-count">0</span></div><div id="recent-list" class="recent-list"><p class="muted-copy">No individual online matches yet.</p></div><p class="history-footnote">Excel contains weekly totals for Weeks 42–43, not individual match records.</p></section>
+          <div class="small-quote"><span>❝</span> It's not about winning. It's about the spreadsheet saying you won.</div>
+        </aside>
+      </div>
+      <footer class="site-footer"><span>UNO CLUB <b>✳</b> MADE FOR COMPETITIVE COWORKERS</span><span>Built for GitHub Pages + Supabase · Not affiliated with Mattel</span></footer>
+    </main>
+  </div>
+
+  <dialog id="player-dialog" class="player-dialog" aria-labelledby="player-dialog-heading">
+    <form id="player-form"><button type="button" id="player-dialog-close" class="dialog-close" aria-label="Close dialog">×</button><div class="section-kicker">EXPAND THE CLUB</div><h2 id="player-dialog-heading">Add a player</h2><p>They'll immediately appear in the standings, starting at zero.</p><label class="field-label" for="new-player-name">PLAYER NAME</label><input id="new-player-name" required minlength="1" maxlength="50" placeholder="New challenger"><button class="button button-submit full-width" type="submit" id="player-save">Add player <span>→</span></button><div class="inline-message" id="player-message" role="status"></div></form>
+  </dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

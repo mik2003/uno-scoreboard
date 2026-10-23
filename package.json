@@ -1,0 +1,11 @@
+{
+  "name": "uno-office-scoreboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Static GitHub Pages scoreboard with a Supabase database",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python3 -m http.server 8000"
+  }
+}
